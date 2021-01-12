@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 
 void main() {
   runApp(MyApp());
@@ -8,7 +9,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'TicTacToe',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primarySwatch: Colors.blue,
@@ -30,14 +31,68 @@ class _TicTacState extends State<TicTac> {
   bool player = true; // false player 2 -- true player 1
   //
   List board = [];
+  String finish = '';
 
   int win(board) {
     for (int i = 0; i <= 2; i++) {
-      if (board[i] == [1, 1, 1]) {
+      if (listEquals(board[i], [1, 1, 1])) {
         return 1;
-      } else if (board[i] == [-1, -1, -1]) return -1;
+      } else if (listEquals(board[i], [-1, -1, -1])) return -1;
+      if (listEquals(
+          [board[i % 3][i], board[(i + 1) % 3][i], board[(i + 2) % 3][i]],
+          [1, 1, 1])) {
+        return 1;
+      } else if (listEquals(
+          [board[i % 3][i], board[(i + 1) % 3][i], board[(i + 2) % 3][i]],
+          [-1, -1, -1])) {
+        return -1;
+      }
     }
+    if (listEquals([board[0][0], board[1][1], board[2][2]], [1, 1, 1]) ||
+        listEquals([board[0][2], board[1][1], board[2][0]], [1, 1, 1])) {
+      return 1;
+    } else if (listEquals(
+            [board[0][0], board[1][1], board[2][2]], [-1, -1, -1]) ||
+        listEquals([board[0][2], board[1][1], board[2][0]], [-1, -1, -1])) {
+      return -1;
+    }
+
     return 0;
+  }
+
+  void winModif() {
+    print(board);
+    setState(() {
+      if (win(board) != 0) {
+        isGame = false;
+        (win(board) == 1) ? finish = 'Player 1 won' : finish = 'Player 2 won';
+      }
+    });
+  }
+
+  Widget iconCustom(cell) {
+    return Icon(
+      (cell == 0)
+          ? Icons.crop_square
+          : (cell == 1) ? Icons.clear : Icons.panorama_fish_eye,
+      size: 80,
+    );
+  }
+
+  void play(a, b) {
+    if (isGame) {
+      setState(() {
+        if (board[a][b] == 0) {
+          if (player) {
+            board[a][b] = 1;
+          } else {
+            board[a][b] = -1;
+          }
+          player = !player;
+        }
+      });
+      winModif();
+    }
   }
 
   @override
@@ -66,10 +121,7 @@ class _TicTacState extends State<TicTac> {
               child: Center(
                 child: Text(
                   'Tic Tac Toe',
-                  style: TextStyle(
-                    fontSize: 30,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
                 ),
               ),
             ),
@@ -77,12 +129,7 @@ class _TicTacState extends State<TicTac> {
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(15),
                 color: Colors.green,
-                boxShadow: [
-                  BoxShadow(
-                    blurRadius: 20,
-                    color: Colors.grey,
-                  )
-                ],
+                boxShadow: [BoxShadow(blurRadius: 20, color: Colors.grey)],
               ),
               margin: EdgeInsets.all(20),
               height: MediaQuery.of(context).size.height * 0.8,
@@ -98,85 +145,16 @@ class _TicTacState extends State<TicTac> {
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
                             GestureDetector(
-                              child: Icon(
-                                (board[0][0] == 0)
-                                    ? Icons.crop_square
-                                    : (board[0][0] == 1)
-                                        ? Icons.clear
-                                        : Icons.panorama_fish_eye,
-                                size: 80,
-                              ),
-                              onTap: () {
-                                if (isGame) {
-                                  setState(() {
-                                    if (board[0][0] == 0) {
-                                      if (player) {
-                                        board[0][0] = 1;
-                                      } else {
-                                        board[0][0] = -1;
-                                      }
-                                      player = !player;
-                                    }
-                                    if (win(board) != 0) {
-                                      isGame = false;
-                                    }
-                                  });
-                                }
-                              },
+                              child: iconCustom(board[0][0]),
+                              onTap: () => play(0, 0),
                             ),
                             GestureDetector(
-                              child: Icon(
-                                (board[0][1] == 0)
-                                    ? Icons.crop_square
-                                    : (board[0][1] == 1)
-                                        ? Icons.clear
-                                        : Icons.panorama_fish_eye,
-                                size: 80,
-                              ),
-                              onTap: () {
-                                if (isGame) {
-                                  setState(() {
-                                    if (board[0][1] == 0) {
-                                      if (player) {
-                                        board[0][1] = 1;
-                                      } else {
-                                        board[0][1] = -1;
-                                      }
-                                      player = !player;
-                                    }
-                                    if (win(board) != 0) {
-                                      isGame = false;
-                                    }
-                                  });
-                                }
-                              },
+                              child: iconCustom(board[0][1]),
+                              onTap: () => play(0, 1),
                             ),
                             GestureDetector(
-                              child: Icon(
-                                (board[0][2] == 0)
-                                    ? Icons.crop_square
-                                    : (board[0][2] == 1)
-                                        ? Icons.clear
-                                        : Icons.panorama_fish_eye,
-                                size: 80,
-                              ),
-                              onTap: () {
-                                if (isGame) {
-                                  setState(() {
-                                    if (board[0][2] == 0) {
-                                      if (player) {
-                                        board[0][2] = 1;
-                                      } else {
-                                        board[0][2] = -1;
-                                      }
-                                      player = !player;
-                                    }
-                                    if (win(board) != 0) {
-                                      isGame = false;
-                                    }
-                                  });
-                                }
-                              },
+                              child: iconCustom(board[0][2]),
+                              onTap: () => play(0, 2),
                             ),
                           ],
                         ),
@@ -184,85 +162,16 @@ class _TicTacState extends State<TicTac> {
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
                             GestureDetector(
-                              child: Icon(
-                                (board[1][0] == 0)
-                                    ? Icons.crop_square
-                                    : (board[1][0] == 1)
-                                        ? Icons.clear
-                                        : Icons.panorama_fish_eye,
-                                size: 80,
-                              ),
-                              onTap: () {
-                                if (isGame) {
-                                  setState(() {
-                                    if (board[1][0] == 0) {
-                                      if (player) {
-                                        board[1][0] = 1;
-                                      } else {
-                                        board[1][0] = -1;
-                                      }
-                                      player = !player;
-                                    }
-                                    if (win(board) != 0) {
-                                      isGame = false;
-                                    }
-                                  });
-                                }
-                              },
+                              child: iconCustom(board[1][0]),
+                              onTap: () => play(1, 0),
                             ),
                             GestureDetector(
-                              child: Icon(
-                                (board[1][1] == 0)
-                                    ? Icons.crop_square
-                                    : (board[1][1] == 1)
-                                        ? Icons.clear
-                                        : Icons.panorama_fish_eye,
-                                size: 80,
-                              ),
-                              onTap: () {
-                                if (isGame) {
-                                  setState(() {
-                                    if (board[1][1] == 0) {
-                                      if (player) {
-                                        board[1][1] = 1;
-                                      } else {
-                                        board[1][1] = -1;
-                                      }
-                                      player = !player;
-                                    }
-                                    if (win(board) != 0) {
-                                      isGame = false;
-                                    }
-                                  });
-                                }
-                              },
+                              child: iconCustom(board[1][1]),
+                              onTap: () => play(1, 1),
                             ),
                             GestureDetector(
-                              child: Icon(
-                                (board[1][2] == 0)
-                                    ? Icons.crop_square
-                                    : (board[1][2] == 1)
-                                        ? Icons.clear
-                                        : Icons.panorama_fish_eye,
-                                size: 80,
-                              ),
-                              onTap: () {
-                                if (isGame) {
-                                  setState(() {
-                                    if (board[1][2] == 0) {
-                                      if (player) {
-                                        board[1][2] = 1;
-                                      } else {
-                                        board[1][2] = -1;
-                                      }
-                                      player = !player;
-                                    }
-                                    if (win(board) != 0) {
-                                      isGame = false;
-                                    }
-                                  });
-                                }
-                              },
+                              child: iconCustom(board[1][2]),
+                              onTap: () => play(1, 2),
                             ),
                           ],
                         ),
@@ -270,85 +179,16 @@ class _TicTacState extends State<TicTac> {
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
                             GestureDetector(
-                              child: Icon(
-                                (board[2][0] == 0)
-                                    ? Icons.crop_square
-                                    : (board[2][0] == 1)
-                                        ? Icons.clear
-                                        : Icons.panorama_fish_eye,
-                                size: 80,
-                              ),
-                              onTap: () {
-                                if (isGame) {
-                                  setState(() {
-                                    if (board[2][0] == 0) {
-                                      if (player) {
-                                        board[2][0] = 1;
-                                      } else {
-                                        board[2][0] = -1;
-                                      }
-                                      player = !player;
-                                    }
-                                    if (win(board) != 0) {
-                                      isGame = false;
-                                    }
-                                  });
-                                }
-                              },
+                              child: iconCustom(board[2][0]),
+                              onTap: () => play(2, 0),
                             ),
                             GestureDetector(
-                              child: Icon(
-                                (board[2][1] == 0)
-                                    ? Icons.crop_square
-                                    : (board[2][1] == 1)
-                                        ? Icons.clear
-                                        : Icons.panorama_fish_eye,
-                                size: 80,
-                              ),
-                              onTap: () {
-                                if (isGame) {
-                                  setState(() {
-                                    if (board[2][1] == 0) {
-                                      if (player) {
-                                        board[2][1] = 1;
-                                      } else {
-                                        board[2][1] = -1;
-                                      }
-                                      player = !player;
-                                    }
-                                    if (win(board) != 0) {
-                                      isGame = false;
-                                    }
-                                  });
-                                }
-                              },
+                              child: iconCustom(board[2][1]),
+                              onTap: () => play(2, 1),
                             ),
                             GestureDetector(
-                              child: Icon(
-                                (board[2][2] == 0)
-                                    ? Icons.crop_square
-                                    : (board[2][2] == 1)
-                                        ? Icons.clear
-                                        : Icons.panorama_fish_eye,
-                                size: 80,
-                              ),
-                              onTap: () {
-                                if (isGame) {
-                                  setState(() {
-                                    if (board[2][2] == 0) {
-                                      if (player) {
-                                        board[2][2] = 1;
-                                      } else {
-                                        board[2][2] = -1;
-                                      }
-                                      player = !player;
-                                    }
-                                    if (win(board) != 0) {
-                                      isGame = false;
-                                    }
-                                  });
-                                }
-                              },
+                              child: iconCustom(board[2][2]),
+                              onTap: () => play(2, 2),
                             ),
                           ],
                         ),
@@ -356,9 +196,7 @@ class _TicTacState extends State<TicTac> {
                     ),
                   ),
                   SizedBox(height: 20),
-                  Center(
-                    child: Text(''),
-                  ),
+                  Center(child: Text(finish)),
                   SizedBox(height: 20),
                   Center(
                     child: Container(
@@ -386,6 +224,7 @@ class _TicTacState extends State<TicTac> {
                         child: Text('Reset'),
                         onPressed: () {
                           setState(() {
+                            finish = '';
                             isGame = false;
                             player = true;
                             board = [
